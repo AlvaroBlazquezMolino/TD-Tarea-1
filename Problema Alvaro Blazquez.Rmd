@@ -1,0 +1,158 @@
+---
+title: "Problema"
+author: "Álvaro Blázquez"
+date: "4/11/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Enunciado:
+
+Álvaro quiere saber a qué jugador fichar para su equipo del fantasy. Dispone de 3 opciones en el mercado de fichajes:
+
+1) Un delantero, que promedia 10 puntos cuando su equipo gana, 5 puntos cuando empata y 2 cuando pierde.
+
+2) Un centrocampista, que promedia 7 puntos cuando gana, 6 cuando empata y 4 cuando pierde.
+
+3) Un defensa, que promedia 8 puntos cuando gana, 5 cuando empata y 3 cuando pierde.
+
+Si quiere maximizar los puntos obtenidos por el fichaje, ¿qué opción es la mejor?
+
+Planteamiento:
+
+- Un decisor.
+
+- Modelo de beneficios (favorable)
+
+- Alternativas:
+
+  - d1: "Fichar delantero"
+  
+  - d2: "Fichar centrocampista"
+  
+  - d3: "Fichar defensa"
+  
+- Estados de la naturaleza:
+
+  - e1: Ganar
+  
+  - e2: Empatar
+  
+  - e3: Perder
+  
+- Valoraciones (puntos otorgados):
+
+  - Alternativa d1:
+  
+    - $x_{1,1}$ = `r 10`
+        
+    - $x_{1,2}$ = `r 5`
+    
+    - $x_{1,3}$ = `r 2`
+        
+  - Alternativa d2:
+  
+    - $x_{2,1}$ = `r 7`
+        
+    - $x_{2,2}$ = `r 6`
+    
+    - $x_{2,3}$ = `r 4`
+    
+  - Alternativa d3:
+  
+    - $x_{3,1}$ = `r 8`
+        
+    - $x_{3,2}$ = `r 5`
+    
+    - $x_{3,3}$ = `r 3`
+    
+    
+    
+```{r}
+source("teoriadecision_funciones_incertidumbre.R",encoding="UTF-8")
+source("FuncionHurwiczEditada.R",encoding = "UTF-8")
+```
+
+```{r}
+tabla <- crea.tablaX(c(10,5,2,7,6,4,8,5,3),
+                      numalternativas = 3,numestados = 3)
+```
+
+-   Método de Wald:
+
+```{r}
+Wald <- criterio.Wald(tabla)
+Wald
+```
+
+La mejor alternativa según el criterio de Wald es fichar un centrocampista.
+
+-   Criterio Optimista:
+
+```{r}
+Opt <- criterio.Optimista(tabla)
+Opt
+```
+
+Segun el criterio optimista le mejor opcion es fichar un delantero.
+
+-   Criterio Hurwicz:
+
+```{r}
+Hur <- criterio.Hurwicz(tabla,favorable = T)
+Hur
+
+criterio.Hurwicz.General(tabla)
+
+dibuja.criterio.Hurwicz(tabla, favorable = T)
+```
+
+Segun el criterio Hurwicz con alfa = 0.3, la opción óptima es fichar un centrocampista.
+
+-   Criterio Savage:
+
+```{r}
+Savage <- criterio.Savage(tabla)
+Savage
+```
+
+Segun el criterio Savage, lo mejor es fichar un delantero o un defensa.
+
+-   Criterio de Laplace:
+
+```{r}
+Laplace <- criterio.Laplace(tabla)
+Laplace
+```
+
+Segun el criterio de Laplace, lo mejor es fichar un delantero o un centrocampista.
+
+-   Criterio Punto ideal:
+
+```{r}
+PI <-criterio.PuntoIdeal(tabla)
+PI
+```
+
+Segun el criterio Punto Ideal, lo mejor es fichar un delantero.
+
+-   Todos los criterios:
+
+```{r}
+Todos <- criterio.Todos(tabla,alfa = 0.5)
+Todos
+```
+
+La opción que más se repite como óptima con todos los criterios es la de fichar al delantero.
+
+Usemos nuestra nueva función:
+
+```{r}
+Hur2 <- criterio.Hurwicz.General2(tabla, alfa=100)
+Hur2
+```
+
+Como vemos, con alfa entre 0 y 0,4 lo óptimo es fichar al centrocampista, mientras que con alfa entre 0,4 y 1 lo mejor será decantarnos por el delantero.
