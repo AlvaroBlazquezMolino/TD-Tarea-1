@@ -134,9 +134,9 @@ Por tanto, las alternativas elegidas son las siguientes:
 - Para una visión pesimista: Alternativa 1 (Viajar a Tokio)
 - Cualquier otro criterio: Alternativa 2 (Viajar a Praga)
 
-Como Jimena es más conservadora, ella optará por viajar a Tokio, sin embargo, Ignacio decidirá viajar a Praga.
+Como Jimena es más conservadora, ella optará por viajar a Tokio y no a Praga, sin embargo, Ignacio decidirá viajar a Praga.
 
-Recomendación: Viajar a Praga.
+Recomendación: Deberían viajar a Praga.
 
 
 
