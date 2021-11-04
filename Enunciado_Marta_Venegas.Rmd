@@ -1,0 +1,142 @@
+---
+title: 'Trabajo Teoría Decisión: Métodos Incertidumbre'
+author: 'Marta Venegas Pardo'
+date: '5-Noviembre-2021'
+output:
+  prettydoc::html_pretty:
+    theme: leonids
+    highlight: github
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+#source("FuncionHurwicz.R")
+source("teoriadecision_funciones_incertidumbre.R")
+```
+
+
+# Enunciado Marta Venegas
+
+
+Jimena e Ignacio están planeando un viaje en navidad de 5 días. El presupuesto de cada uno es de 4000 euros , aunque Jimena opina que quizás esa fecha para viajar es un poco cara y que no pueden descuidar el presupuesto, sin embargo Ignacio considera que son fechas especiales y hay que disfrutar de las vacaciones. Ambos son Madrileños y volarían desde esta ciudad. Cuando se sientan a organizar y planificar el viaje los dos coinciden en tres posibles destinos: Pekin, Praga y Nueva York.
+
+Para ir a Pekin, el precio del billete es de 1200 euros por persona, teniendo que viajar durante 18 horas. En esta ciudad, han encontrado un apartamento muy barato, que les costaría  350 euros en total por todas las noches
+
+En el viaje a Praga, se gastarían 800 euros por personas en el billete, llegando a la ciudad en un total de 2 horas y 55 minutos. El hotel les costaría 1200 euros en total.
+
+Por último, el viaje a Nueva York el vuelo son 1065 euros y tardarían 8 horas y cuarto en llegar. En Nueva York, el hotel cuesta 1300 euros.
+
+El gasto medio estimado en cada ciudad, contando con comidas, compras y otros gastos son los siguientes: Para Tokio 900 euros por persona, 700 euros euros en Praga y unos 1300 euros en Nueva York.
+
+Ignacio plantea la posibilidad de adquirir un bono joven de actividades culturales planificadas en cada ciudad, lo que supondría un precio de 200 (Tokio),280 (Nueva York) y 330 (Praga) euros respectivamente. Si adquieren el bono joven, estiman que los gastos en cada ciudad se abaratarían un 20%, ya que obtienen descuentos en comidas y otras compras por tener este abono.
+
+
+¿Qué destino le recomendaría usted? ¿Qué destino cree que elegirá cada uno?
+
+## Planteamiento
+
+- Plantearemos en primer lugar el problema como de un decisor (dos personas que actúan como único decisor) y luego como dos problemas diferentes de un único decisor (uno optimista, Ignacio y otro pesimista, Jimena)
+
+- Modelo de costos
+
+
+- Alternativas: 
+
+    -   d1="Viaje a Tokio"
+    -   d2="Viaje a Praga"
+    -   d3="Viaje a Nueva York"
+
+-   Estados de la naturaleza:
+
+    -   e1 = "Coger bono joven"
+    -   e2 = "Ir sin bono joven"
+
+-   Tabla de valoraciones (costo para cada destino):
+
+    -   Estado e1:
+
+        -   $x_{1,1} = x_{\text{Pekín},\text{Bono} }= 2 \cdot1200+350+200+(900-0.2 \cdot900)=$  `r 2*1200+350+200+(900-0.2 *900)`
+        -   $x_{1,2} = x_{\text{Praga},\text{Bono} }= 2 \cdot 800+1200+330+(700-0.2 \cdot 700)=$  `r 2*800+1200+330+(700-0.2 * 700)`
+        -   $x_{1,3} = x_{\text{Nueva York},\text{Bono} }= 2 \cdot 1065+1300+280+(1300-0.2 \cdot1600)=$  `r 2*1065+1300+280+(1300-0.2 *1300)`
+        
+    -   Estado e2:
+
+        -   $x_{2,1} = x_{\text{Pekín},\text{Sin bono} }= 2 \cdot1200+350+900=$  `r 2*1200+350+900`
+        -   $x_{2,2} = x_{\text{Praga},\text{Sin bono} }= 2 \cdot 800+1200+700=$  `r 2*800+1200+700`
+        -   $x_{2,3} = x_{\text{Nueva York},\text{Sin bono} }= 2 \cdot 1065+1300+1300=$  `r 2*1065+1300+1300`
+
+## Solución
+
+### Tabla de valoración
+
+Creamos la tabla de valoración:
+
+```{r}
+tbVenegas = crea.tablaX(c(3670,3650,
+                     3690,3500,
+                     4750,4730),
+                   numalternativas = 3,
+                   numestados = 2)
+tbVenegas
+```
+
+
+
+### Todos los criterios juntos
+
+Vamos a resolver el problema por todos los métodos de una única vez, utilizando la función *criterio.Todos*.
+Solución
+
+        
+```{r}
+solVenegas <- criterio.Todos(tbVenegas, 
+                        alfa = 0.5 ,
+                        favorable = FALSE) #modelo costos
+solVenegas
+```
+
+#### Dibujo Criterio de Hurwicz 
+
+```{r}
+dibuja.criterio.Hurwicz(tbVenegas,favorable = FALSE)
+```
+
+### Conclusiones
+
+Si nos fijamos en la línea discontinua morada, sabemos que alternativa elegimos para cada valor de $\alpha$. Hasta un valor de $\alpha = 0.1$, la alternativa elegirda será viajar a Tokio mientras que a partir de este valor se viajará a Praga. En ningún caso realizarán un viaje a Nueva York, ya que es mucho más caro que las otras opciones.
+
+Vemos como en todos los criterios menos el criterio de Wald o Criterio Pesimista, al alternativa elegida es la 2, es decir, viajar a Praga. En ningún método viajar a Nueva York es la opción elegida, ya que es el viaje más costoso.
+
+
+
+## Solución con Nueva función
+
+```{r}
+source("FuncionHurwiczEditada.R")
+```
+
+
+
+```{r}
+criterio.Hurwicz.General2(tablaX = tbVenegas,favorable = FALSE,alfa = 0.4 ) # modelo de costos 
+```
+
+### Conclusiones
+
+Por tanto, las alternativas elegidas son las siguientes:
+
+- Para una visión pesimista: Alternativa 1 (Viajar a Tokio)
+- Cualquier otro criterio: Alternativa 2 (Viajar a Praga)
+
+Como Jimena es más conservadora, ella optará por viajar a Tokio, sin embargo, Ignacio decidirá viajar a Praga.
+
+Recomendación: Viajar a Praga.
+
+
+
