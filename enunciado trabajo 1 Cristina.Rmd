@@ -1,0 +1,156 @@
+---
+title: "Enunciado Trabajo 1"
+author: "Cristina Acosta Muñiz"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Enunciado Trabajo 1
+
+Maria recibe una herencia de varias propiedades y algunas deudas. Recibe como propiedades un chalet valorado en 120.000 euros, un piso a pie de playa valorado en 150.000 euros pero le han dejado en herencia una cantidad de 200.000 euros. Entonces, María se plantea dos opciones: vender ambas propiedades y asi poder liquidar la deuda y ganar dinero o bien rechazar la herencia y perder ambas propiedades y asi no tiene porque pagar la deuda. Por lo tanto, María quiere saber cual es la mejor decisión en la que podria ganar mas dinero.
+
+
+**Solución:**
+
+1. Planteamiento:
+
+- Un decisor.
+
+- Modelo de beneficios (favorable)
+
+- Alternativas:
+
+  - d1: "Aceptar la herencia"
+  
+  - d2: "Rechazar la herencia"
+  
+- Estados de la naturaleza:
+
+  - e1: Vender ambas propiedades
+  
+  - e2: Vender solamente el chalet
+  
+  - e3: Vender solamente el piso
+  
+  - e4: No vender ninguna propiedad
+  
+- Valoraciones (beneficio conseguido cada uno):
+
+  - Alternativa d1:
+  
+    - $x_{1,1}$ = `r 120000 + 150000 - 200000`
+        
+    - $x_{1,2}$ = `r 120000 - 200000`
+    
+    - $x_{1,3}$ = `r 150000 - 200000`
+    
+    - $x_{1,4}$ = `r - 200000`
+        
+  - Alternativa d2:
+  
+    - $x_{2,1}$ = `r 0`
+        
+    - $x_{2,2}$ = `r 0`
+    
+    - $x_{2,3}$ = `r 0`
+    
+    - $x_{2,4}$ = `r 0`
+    
+```{r}
+source("teoriadecision_funciones_incertidumbre.R",encoding="UTF-8")
+```
+
+    
+```{r}
+m <- crea.tablaX(c(7*10^4,-8*10^4,-5*10^4,-2*10^5,0,0,0,0),
+                      numalternativas = 2,numestados = 4)
+m
+```
+
+-   Método de Wald:
+
+```{r}
+sol_W <- criterio.Wald(m)
+sol_W
+```
+
+La mejor alternativa según el criterio de Wald es la "d2", es decir, renunciar a la herencia.
+
+-   Criterio Optimista:
+
+```{r}
+sol_O <- criterio.Optimista(m)
+sol_O
+```
+
+Segun el criterio Optimista le mejor opcion es "d1", es decir, aceptar la herencia
+
+-   Criterio Hurwicz:
+
+```{r}
+sol_H <- criterio.Hurwicz(m,favorable = T)
+sol_H
+```
+
+```{r}
+criterio.Hurwicz.General(m)
+```
+
+Segun el criterio Hurwicz, la opción es "d2", es decir, rechazar la herencia
+
+```{r}
+dibuja.criterio.Hurwicz(m)
+```
+
+-   Criterio Savage:
+
+```{r}
+sol_S <- criterio.Savage(m)
+sol_S
+```
+
+Segun el criterio Savage, la opción es "d2", es decir, rechazar la herencia
+
+-   Criterio LaPlace:
+
+```{r}
+sol_LP <- criterio.Laplace(m)
+sol_LP
+```
+
+Segun el criterio LaPlace, la opción es "d2", es decir, rechazar la herencia
+
+-   Criterio Punto ideal:
+
+```{r}
+sol_PI <-criterio.PuntoIdeal(m)
+sol_PI
+```
+
+Segun el criterio Punto Ideal, la opción es "d2", es decir, rechazar la herencia
+
+-   Todos los criterios:
+
+```{r}
+sol_T <- criterio.Todos(m,alfa = 0.5)
+sol_T
+```
+
+Podemos ver que en la mayoria de criterios la mejor opcion es rechazar la herencia.
+
+Ahora, vamos a aplicar la funcion que hemos creado para este trabajo.
+
+
+```{r}
+source("FuncionHurwiczEditada.R",encoding = "UTF-8")
+```
+
+```{r}
+criterio.Hurwicz.General2(m)
+```
+
