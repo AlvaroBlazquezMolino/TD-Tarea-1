@@ -3,6 +3,11 @@ title: 'Trabajo Teoría Decisión: Métodos Incertidumbre'
 author: 'Marta Venegas Pardo'
 date: '5-Noviembre-2021'
 output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_section: yes
+    
   prettydoc::html_pretty:
     theme: leonids
     highlight: github
