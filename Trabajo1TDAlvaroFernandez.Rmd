@@ -1,0 +1,200 @@
+---
+title: "Trabajo 1 TD"
+author: "Álvaro Fernández-Blanco Centeno"
+date: "4/11/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Enunciado:
+
+Una empresa textil sabe que se le pueden presentar 3 estados o situaciones posibles para el año que viene:
+
+E1. La empresa tiene ventas bajas E2. La empresa tiene ventas medias E3. La empresa tiene ventas bajas
+
+Sin embargo, antes tiene que tomar una de las siguientes 3 decisiones
+
+A1. Realizar una inversión elevada A2. Realizar una inversión media A3. Realizar una inversión baja
+
+Los resultados de cada decisión (beneficios) en miles de euros varían, dependiendo del estado que finalmente se presente y se puede reflejar con la siguiente matriz:
+
+¿Cuál es la mejor opción para maximizar los beneficios de la empresa?
+
+```{r}
+library(knitr)
+source("TDecisionCodigo/teoriadecision_funciones_incertidumbre.R")
+```
+
+```{r}
+vec=c(180,250,300,200,280,290,220,240,250)
+tabla=matrix(vec,ncol = 3,nrow = 3, byrow = TRUE)
+as.data.frame(tabla)
+colnames(tabla)=c("Ventas bajas","Ventas medias","Ventas altas")
+rownames(tabla)=c("Inversión baja","Inversión media","Inversión alta")
+tabla
+```
+
+# Solución:
+
+Pasamos a resolver el problema con cada uno de los métodos vistos:
+
+**Criterio de Wald o pesimista:**
+
+```{r}
+mat=crea.tablaX(vec,numalternativas = 3,numestados = 3)
+criterio.Wald(mat)
+```
+
+Con este método, la alternativa que óptima es la tercera.
+
+**Criterio Optimista:**
+
+```{r}
+criterio.Optimista(mat)
+```
+
+Con este método, la alternativa que óptima es la primera.
+
+**Criterio Hurwicz:**
+
+```{r}
+criterio.Hurwicz(mat)
+```
+
+Con este método, la alternativa que óptima es la tercera.
+
+**Criterio Savage:**
+
+```{r}
+criterio.Savage(mat)
+```
+
+Con este método, la alternativa que óptima es la segunda.
+
+**Criterio Laplace:**
+
+```{r}
+criterio.Laplace(mat)
+```
+
+Con este método, la alternativa que óptima es la segunda.
+
+**Criterio Punto Ideal:**
+
+```{r}
+criterio.PuntoIdeal(mat)
+```
+
+Con este método, la alternativa que óptima es la segunda.
+
+Aplicamos ahora todos los criterios a la vez:
+
+```{r}
+criterio.Todos(mat)
+```
+
+Creamos la función pedida:
+
+```{r}
+criterio.Hurwicz.General2 = function(tablaX,alfa=0.3,favorable=TRUE) {
+  # si alfa es un escalar entre 0 y 1 lo obtiene para ese único valor
+  # si alfa es igual a un número mayor que 1, lo usa para obtener cálculos para dividir el rango 0-1
+  X = tablaX;
+  if (favorable) {
+    Altmin = apply(X,MARGIN=1,min);
+    Altmax= apply(X,MARGIN=1,max);
+    if (alfa<=1) {
+      valfa = seq(from=0,to=1,by=(alfa));
+    } else {
+      valfa = seq(from=0,to=1,by=(1/alfa)); ## alfa: 100, 200,
+    }
+    vHurwicz = rep(0,length(valfa))
+    Alt_vHurwicz = rep(0,length(valfa))
+    ##
+    alfab = valfa[1];
+    vAltH = alfab * Altmax + (1-alfab) * Altmin;
+    vHurwicz[1] = max(vAltH);
+    Alt_vHurwicz[1] = which.max(vAltH);
+    Alt_vHurwicz_g = which.max.general(vAltH);
+    
+    alfasCambio=c(alfab);
+    alternativas=c(which.max(vAltH));
+    
+    for (i in 2:length(valfa)) {
+      alfab = valfa[i];
+      vAltH = alfab * Altmax + (1-alfab) * Altmin;
+      vHurwicz[i] = max(vAltH);
+      Alt_vHurwicz[i] = which.max(vAltH);
+      Alt_vHurwicz_g = which.max.general(vAltH);
+      
+      if (Alt_vHurwicz[i]!=Alt_vHurwicz[i-1]) {
+        alfasCambio=c(alfasCambio,alfab);
+        alternativas=c(alternativas, which.max(vAltH));
+      }
+    }
+    metodo = 'favorable';
+  } else {
+    Altmin = apply(X,MARGIN=1,min);
+    Altmax= apply(X,MARGIN=1,max);
+    if (alfa<=1) {
+      valfa = seq(from=0,to=1,by=(alfa));
+    } else {
+      valfa = seq(from=0,to=1,by=(1/alfa)); ## alfa: 100, 200,
+    }
+    vHurwicz = rep(0,length(valfa))
+    Alt_vHurwicz = rep(0,length(valfa))
+    
+    alfab = valfa[1];
+    vAltH = (1-alfab) * Altmax + alfab * Altmin;
+    vHurwicz[1] = min(vAltH);
+    Alt_vHurwicz[1] = which.min(vAltH);
+    Alt_vHurwicz_g = which.min.general(vAltH);
+    
+    alfasCambio=c(alfab);
+    alternativas=c(which.min(vAltH));
+    
+    for (i in 2:length(valfa)) {
+      alfab = valfa[i];
+      vAltH = (1-alfab) * Altmax + alfab * Altmin;
+      vHurwicz[i] = min(vAltH);
+      Alt_vHurwicz[i] = which.min(vAltH);
+      Alt_vHurwicz_g = which.min.general(vAltH);
+      if (Alt_vHurwicz[i]!=Alt_vHurwicz[i-1]) {
+        alfasCambio=c(alfasCambio,alfab);
+        alternativas=c(alternativas, which.min(vAltH));
+      }
+      
+    }
+    metodo = 'desfavorable';
+  }
+  resultados = list();
+  resultados$criterio = 'Hurwicz';
+  resultados$alfa = alfa;
+  resultados$metodo = metodo;
+  resultados$tablaX = tablaX;
+  resultados$ValorAlternativas = vAltH;
+  resultados$ValorOptimo = vHurwicz;
+  
+  resultados$alternativasPorIntervalos = alternativas;
+  resultados$alfas = alfasCambio;
+  
+  if (length(valfa)==1) {
+    resultados$AlternativaOptima = Alt_vHurwicz_g;
+  } else {
+    resultados$AlternativaOptima = Alt_vHurwicz;
+  }
+  
+  return(resultados);
+}
+```
+
+La aplicamos al caso particular del enunciado:
+
+```{r}
+criterio.Hurwicz.General2(mat)
+```
