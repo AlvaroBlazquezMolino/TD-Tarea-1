@@ -1,0 +1,194 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# Problema
+
+Alberto está de viaje y está alojado temporalmente en una casa y mañana por la mañana parte a otra zona del país que está visitando. Por ser la última noche quiere salir a cenar fuera y de paso, si lo ve conveniente probar un helado porque al parecer en esa zona y los pueblos de alrededor hacen unos helados excelentes. Tiene 3 opciones:
+
+1\) Cenar en un restaurante al norte de la ciudad por 30 euros y, si quiere helado coger el coche y conducir al pueblo del norte, gastando así 5 euros más en gasolina, y pagar 5 euros por un helado; si no lo quiere se volvería andando.
+
+2\) Cenar en un restaurante a las afueras, por la zona sur, por 15 euros y coger el coche gastando 15 euros en gasolina para tomarse un helado en la heladería anterior por lo que gastaría otros 5 euros por él. Igualmente, si rechaza la opción del helado, vuelve andando.
+
+3\) Cenar al lado del apartamento por 25 euros y tomarse un helado en la mejor heladería de la ciudad en la cual se gastaría otros 20 euros adicionales por el pack de un helado en el momento en el local y llevarse una tarrina extra.
+
+¿Cuál es la mejor opción para minimizar los costes?
+
+-   Solución usando la función creada:
+
+    -   Planteamiento:
+
+        -   Un decisor
+
+        -   Modelo de costes (desfavorable)
+
+    -   Alternativas:
+
+        -   d1= "Cenar zona norte y tomar helado"
+
+        -   d2= "Cenar zona sur y tomar helado"
+
+        -   d3= "Cenar cerca apartamento y tomar helado"
+
+    -   Estados de la naturaleza:
+
+        -   e1= "Toma helado"
+
+        -   e2= "No toma helado"
+
+    -   Valoraciones:
+
+        -   Estado e1: representado en euros
+
+            -   \$x\_{1,1}=\$30+10
+
+            -   \$x\_{2,1}\$15+20
+
+            -   \$x\_{3,1}\$25+20
+
+        -   Estado e2: representado en euros
+
+            -   \$x\_{2,1}=\$30
+
+            -   \$x\_{2,2}=\$15
+
+            -   \$x\_{2,3}=\$25
+
+    -   Introducción de datos:
+
+```{r}
+source("teoriadecision_funciones_incertidumbre.R")
+tabla=crea.tablaX(c(40,30,
+                    35,15,
+                    45,25),numalternativas = 3, numestados = 2)
+criterio.Hurwicz.General2 = function(tablaX,alfa=0.3,favorable=TRUE) {
+  # si alfa es un escalar entre 0 y 1 lo obtiene para ese único valor
+  # si alfa es igual a un número mayor que 1, lo usa para obtener cálculos para dividir el rango 0-1
+  X = tablaX;
+  if (favorable) {
+    Altmin = apply(X,MARGIN=1,min);
+    Altmax= apply(X,MARGIN=1,max);
+    if (alfa<=1) {
+      valfa = seq(from=0,to=1,by=(alfa));
+    } else {
+      valfa = seq(from=0,to=1,by=(1/alfa)); ## alfa: 100, 200,
+    }
+    vHurwicz = rep(0,length(valfa))
+    Alt_vHurwicz = rep(0,length(valfa))
+    ##
+    alfab = valfa[1];
+    vAltH = alfab * Altmax + (1-alfab) * Altmin;
+    vHurwicz[1] = max(vAltH);
+    Alt_vHurwicz[1] = which.max(vAltH);
+    Alt_vHurwicz_g = which.max.general(vAltH);
+    
+    alfasCambio=c(alfab);
+    alternativas=c(which.max(vAltH));
+    
+    for (i in 2:length(valfa)) {
+      alfab = valfa[i];
+      vAltH = alfab * Altmax + (1-alfab) * Altmin;
+      vHurwicz[i] = max(vAltH);
+      Alt_vHurwicz[i] = which.max(vAltH);
+      Alt_vHurwicz_g = which.max.general(vAltH);
+      
+      if (Alt_vHurwicz[i]!=Alt_vHurwicz[i-1]) {
+        alfasCambio=c(alfasCambio,alfab);
+        alternativas=c(alternativas, which.max(vAltH));
+      }
+    }
+    metodo = 'favorable';
+  } else {
+    Altmin = apply(X,MARGIN=1,min);
+    Altmax= apply(X,MARGIN=1,max);
+    if (alfa<=1) {
+      valfa = seq(from=0,to=1,by=(alfa));
+    } else {
+      valfa = seq(from=0,to=1,by=(1/alfa)); ## alfa: 100, 200,
+    }
+    vHurwicz = rep(0,length(valfa))
+    Alt_vHurwicz = rep(0,length(valfa))
+    
+    alfab = valfa[1];
+    vAltH = (1-alfab) * Altmax + alfab * Altmin;
+    vHurwicz[1] = min(vAltH);
+    Alt_vHurwicz[1] = which.min(vAltH);
+    Alt_vHurwicz_g = which.min.general(vAltH);
+    
+    alfasCambio=c(alfab);
+    alternativas=c(which.min(vAltH));
+    
+    for (i in 2:length(valfa)) {
+      alfab = valfa[i];
+      vAltH = (1-alfab) * Altmax + alfab * Altmin;
+      vHurwicz[i] = min(vAltH);
+      Alt_vHurwicz[i] = which.min(vAltH);
+      Alt_vHurwicz_g = which.min.general(vAltH);
+      if (Alt_vHurwicz[i]!=Alt_vHurwicz[i-1]) {
+        alfasCambio=c(alfasCambio,alfab);
+        alternativas=c(alternativas, which.min(vAltH));
+      }
+      
+    }
+    metodo = 'desfavorable';
+  }
+  resultados = list();
+  resultados$criterio = 'Hurwicz';
+  resultados$alfa = alfa;
+  resultados$metodo = metodo;
+  resultados$tablaX = tablaX;
+  resultados$ValorAlternativas = vAltH;
+  resultados$ValorOptimo = vHurwicz;
+  
+  resultados$alternativasPorIntervalos = alternativas;
+  resultados$alfas = alfasCambio;
+  
+  if (length(valfa)==1) {
+    resultados$AlternativaOptima = Alt_vHurwicz_g;
+  } else {
+    resultados$AlternativaOptima = Alt_vHurwicz;
+  }
+  
+  return(resultados);
+  
+  
+  
+}
+criterio.Hurwicz.General2(tabla, favorable = FALSE)
+                          
+                        
+```
+
+-   Solucion con el criterio de Laplace:
+
+```{r}
+
+criterio.Laplace(tabla, favorable=FALSE)
+```
+
+-   Solución usando el criterio optimista:
+
+    ```{r}
+    criterio.Optimista(tabla,favorable=FALSE)
+    ```
+
+-   Solución usando el criterio Punto Ideal:
+
+    ```{r}
+    criterio.PuntoIdeal(tabla,favorable=FALSE)
+    ```
+
+-   Solución usando el criterio de Savage:
+
+```{r}
+criterio.Savage(tabla,favorable=FALSE)
+```
+
+-   Solución usando el criterio de Wald:
+
+```{r}
+criterio.Wald(tabla,favorable=FALSE)
+```
