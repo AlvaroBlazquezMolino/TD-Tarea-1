@@ -62,3 +62,26 @@ Por lo tanto, María quiere saber cual es la mejor decisión en la que podria ga
 3) Un defensa, que promedia 8 puntos cuando gana, 5 cuando empata y 3 cuando pierde.
 
 Si quiere maximizar los puntos obtenidos por el fichaje, ¿qué opción es la mejor?
+
+- Álvaro Fernández-Blanco:
+
+Una empresa textil sabe que se le pueden presentar 3 estados o situaciones posibles para el año que viene:
+
+E1. La empresa tiene ventas bajas 
+E2. La empresa tiene ventas medias 
+E3. La empresa tiene ventas bajas
+
+Sin embargo, antes tiene que tomar una de las siguientes 3 decisiones
+
+A1. Realizar una inversión elevada 
+A2. Realizar una inversión media 
+A3. Realizar una inversión baja
+
+Los resultados de cada decisión (beneficios) en miles de euros varían, dependiendo del estado que finalmente se presente y se puede reflejar con la siguiente tabla:
+
+                 Ventas bajas  Ventas medias  Ventas altas
+Inversión baja        180            250           300
+Inversión media       200            280           290
+Inversión alta        220            240           250
+
+¿Cuál es la mejor opción para maximizar los beneficios de la empresa?
